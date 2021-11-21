@@ -104,3 +104,11 @@
 >   https://answers.ros.org/question/214712/gazebo-controller-spawner-warning/    
 >   http://gazebosim.org/tutorials/?tut=ros_control
 
+## Gripper  
+   
+> dynamixel로 만든 1DOF gripper position 제어     
+> dynamixel ID, port number 항상 확인    
+>     
+> * dxl_gripper_ctrl.py : 두 개의 그리퍼를 하나의 USB port 활용    
+> * dxl_gripper_ctrl1.py, dxl_gripper_ctrl2.py : 각 그리퍼당 하나의 USB port, 총 2개 활용    
+>     
