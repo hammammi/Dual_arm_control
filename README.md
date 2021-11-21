@@ -4,9 +4,50 @@
 > **mservo_msg** : mservo lab에서 사용하는 ros msgs   
 
 ## EtherCAT   
+> xenomai, soem 필요   
+> 관리자 권한 터미널  (sudo -s) 에서 실행   
+> 사용 시 ecat_ifname 항상 확인..   
+> dualarm 사용 시 junction 사용, 배터리 항상 확인 필요
+   
+> **ethercat_test**
+> - ethercat_control_csv :    
+>  ethercat_ctrl_integ :    
+> junction 사용, manipulator position control & wheel velocity control
 
 
-## MoveIt   
+> **참고**    
+> * ethtool parameter persist 변경 방법       
+> ```    
+> $ cd /etc/NetworkManager/dispatcher.d    
+> $ sudo nano 20-ethtool    
+> ```    
+> ```    
+> #!/bin/bash    
+> /sbin/ethtool -C eno1 rx-usecs 0    
+> ```    
+> ```      
+> $ sudo chmod +x 20-ethtool    
+> $ reboot    
+> ```    
+> * lan port를 찾지 못하는 경우
+> ```
+> $ sudo nano /etc/netplan/*.ymal    
+> ```    
+> 내에 네트워크를 추가한다    
+> ```    
+> network:    
+>   ethernets:    
+>      eno1:    
+>         dhcp4:yes    
+>         dhcp6:yes (안해도됨)    
+> ```    
+> ```    
+> $ sudo netplan apply        
+> ```    
+> ifconfig 명령을 통해 적용된 내용확인   
+   
+
+## Gazebo & MoveIt   
    
 > **dualarm_config** : solidworks로 만든 urdf 파일과 mesh 파일 (STL)   
 >
@@ -61,5 +102,7 @@
 > **move_robot** : c++/c/python 이용해서 매니퓰레이터 제어하는 코드 모음   
 
 > **참고**   
->   https://github.com/eYSIP-2017/eYSIP-2017_Robotic_Arm/wiki/Interfacing-MoveIt%21-with-Gazebo 
+>   https://github.com/eYSIP-2017/eYSIP-2017_Robotic_Arm/wiki/Interfacing-MoveIt%21-with-Gazebo    
+>   https://answers.ros.org/question/214712/gazebo-controller-spawner-warning/    
+>   http://gazebosim.org/tutorials/?tut=ros_control
 
