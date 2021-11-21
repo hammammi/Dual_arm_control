@@ -32,20 +32,30 @@ joint 6만 CCW가 + 방향 이므로 작동 시 확인 바람
 -> config 폴더 내 파일 수정내역   
 dualarm.rviz : bringup_rviz launch 시 초기화면 설정을 위한 rviz config 파일, rviz에서 다른이름 저장으로 생성   
 dualarm_controllers.yaml : MoveIt에서 불러오는 controller list를 제공하기 위해 생성   
+(controller의 name과 action_ns가 gazebo가 받는 topic과 일치할 수 있도록 작성)
 gazebo_joint_states.yaml : joint_state를 publish하기 위해 생성   
-ros_contollers.yaml : gazebo와 ros_control을 위해 MoveIt에서 생성된 파일 수정
+ros_contollers.yaml : gazebo와 ros_control을 위해 MoveIt에서 생성된 파일 수정   
+(MoveIt controller != ros_control controller 이므로 yaml 파일을 두개로 나누어 사용(dualarm/ros controllers.yaml))   
 
--> launch 폴더 내 파일 수정내역
 
----------------------------------------------------------------------   
+-> launch 폴더 내 파일 수정내역   
+dualarm_bringup_gazebo.launch : gazebo 활용 위해 생성   
+dualarm_bringup_rviz.launch : rviz 활용 위해 생성   
+dualarm_moveit_controller_manager.launch : dualarm_controllers.yaml 참조 위해 수정  
+(joint_controller_spawner의 ns가 urdf의 gazebo library 캡션 내의 ns와 같은지 확인 필요. Controller Spawner couldn't find the expected controller_manager ROS interface error 해결)   
+gazebo_states.launch : gazebo_joint_states.yaml 참조 및 robot state publisher 위해 생성   
+moveit_rviz.launch : defalt rviz config 파일 경로 수정   
+planning_context.launch : srdf파일 추가 (rviz planning scene error 해결)   
+ros_controllers.launch : 내용 잘 맞는지 확인
 
-move_robot : c++/c/python 이용해서 매니퓰레이터 제어하는 코드 모음   
 
----------------------------------------------------------------------
-## MoveIt 활용 시 execution order
+-> execution order
 
 terminal1   
 $ roslaunch dualarm_moveit dualarm_bringup_gazebo.launch   
 terminal2   
 $ roslaunch dualarm_moveit dualarm_bringup_rviz.launch   
+   
+- move_robot : c++/c/python 이용해서 매니퓰레이터 제어하는 코드 모음   
+
 
