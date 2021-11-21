@@ -56,8 +56,10 @@
 > ```
 > $ roslaunch dualarm_moveit dualarm_bringup_rviz.launch   
 > ```
-   
+ 
    
 > **move_robot** : c++/c/python 이용해서 매니퓰레이터 제어하는 코드 모음   
 
+> **참고**   
+>   https://github.com/eYSIP-2017/eYSIP-2017_Robotic_Arm/wiki/Interfacing-MoveIt%21-with-Gazebo 
 
