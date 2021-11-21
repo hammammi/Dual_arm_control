@@ -10,11 +10,9 @@
 > dualarm 사용 시 junction 사용, 배터리 항상 확인 필요
    
 > **ethercat_test**
-> - ethercat_control_csv :    
->  ethercat_ctrl_integ :    
-> junction 사용, manipulator position control & wheel velocity control
-
-
+> - ecat_profile_pos_1.cpp,ecat_profile_pos_2.cpp,mani_ecat_homing.cpp : junction 없이 사용
+> - dualarm_ecat_ctrl.cpp
+     
 > **참고**    
 > * ethtool parameter persist 변경 방법       
 > ```    
