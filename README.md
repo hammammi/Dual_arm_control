@@ -1,16 +1,14 @@
 # mservo_manipulator_control
 
 ## massage   
-mservo_msg : mservo lab에서 사용하는 ros msgs   
+> **mservo_msg** : mservo lab에서 사용하는 ros msgs   
 
 ## EtherCAT   
 
 
 ## MoveIt   
-
-package :   
    
-> dualarm_config : solidworks로 만든 urdf 파일과 mesh 파일 (STL)   
+> **dualarm_config** : solidworks로 만든 urdf 파일과 mesh 파일 (STL)   
 >
 > * 아래 moveit 패키지 만들 시 urdf가 수정됨
 > * urdf 생성 시 dualarm으로 바로 생성되지 않아 ver1/ver2 각각 urdf 생성 후 파일 수정하여 base link에 연결   
@@ -25,7 +23,7 @@ package :
 > joint 6만 CCW가 + 방향 이므로 작동 시 확인 바람   
    
    
-> dualarm_moveit : dualarm_config로 moveit_setup_assistant 이용해서 생성된 패키지   
+> **dualarm_moveit** : dualarm_config로 moveit_setup_assistant 이용해서 생성된 패키지   
 >   
 > * setup assistant에서 manipulator뿐 아니라 eef 그룹 또한 생성 필요 (현재는 manipulator 마지막 링크와 solid 그리퍼로만 생성)   
 > * config 폴더 및 launch 폴더의 파일 수정 필요   
@@ -51,11 +49,15 @@ package :
 > -> execution order
 >   
 > terminal1   
+> ```
 > $ roslaunch dualarm_moveit dualarm_bringup_gazebo.launch   
+> ```
 > terminal2   
+> ```
 > $ roslaunch dualarm_moveit dualarm_bringup_rviz.launch   
+> ```
    
    
-> move_robot : c++/c/python 이용해서 매니퓰레이터 제어하는 코드 모음   
+> **move_robot** : c++/c/python 이용해서 매니퓰레이터 제어하는 코드 모음   
 
 
