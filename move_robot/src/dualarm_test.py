@@ -13,13 +13,13 @@ from sensor_msgs.msg import Image
 import geometry_msgs.msg
 from dxl_gripper.srv import GripperDist, GripperDistResponse
 from moveit_commander.conversions import pose_to_list
-from cip_data.gqcnn import calc_grasping_point
-from scipy.spatial.transform import Rotation as R
+#from cip_data.gqcnn import calc_grasping_point
+#from scipy.spatial.transform import Rotation as R
 
 from math import pi
 import numpy as np
 from matplotlib import pyplot as plt
-import cv2
+#import cv2
 import time
 
 ## END_SUB_TUTORIAL
@@ -381,7 +381,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     ## END_SUB_TUTORIAL
 
   def gripper_request(self, dist):
-    if self.robot_name == 'arm_ver1':
+    if self.robot_name == 'manipulator1':
       rospy.wait_for_service('gripper_dist_1')
       try:
         result = rospy.ServiceProxy('gripper_dist_1', GripperDist)
@@ -456,8 +456,8 @@ def main():
     print( "")
     print( "============ Press `Enter` to begin the tutorial by setting up the moveit_commander ...")
     # raw_input()
-    manipulator1 = MoveGroupPythonIntefaceTutorial('arm_ver1') #right
-    manipulator2 = MoveGroupPythonIntefaceTutorial('arm_ver2') #left
+    manipulator1 = MoveGroupPythonIntefaceTutorial('manipulator1') #right
+    manipulator2 = MoveGroupPythonIntefaceTutorial('manipulator2') #left
 
     print( "============ Press `Enter` to execute a movement using a joint state goal ...")
     manipulator = False
