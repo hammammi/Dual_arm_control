@@ -81,6 +81,7 @@
 > dualarm_moveit_controller_manager.launch : dualarm_controllers.yaml 참조 위해 수정  
 > (joint_controller_spawner의 ns가 urdf의 gazebo library 캡션 내의 ns와 같은지 확인 필요. Controller Spawner couldn't find the expected controller_manager ROS interface error 해결)   
 > gazebo_states.launch : gazebo_joint_states.yaml 참조 및 robot state publisher 위해 생성   
+>  (controller_spawner와 joint_controller_spawner의 namespace가 같은지 확인 필요. )
 > moveit_rviz.launch : defalt rviz config 파일 경로 수정   
 > planning_context.launch : srdf파일 추가 (rviz planning scene error 해결)   
 > ros_controllers.launch : 내용 잘 맞는지 확인
