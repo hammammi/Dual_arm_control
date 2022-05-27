@@ -111,6 +111,23 @@
 >   https://answers.ros.org/question/214712/gazebo-controller-spawner-warning/    
 >   http://gazebosim.org/tutorials/?tut=ros_control
 
+## GQCNN  
+   
+> realsense D435i와 함께 활용
+> 가장 먼저 도커 설치   
+> 압축파일 내 docker.sh 실행시켜 컨테이너 생성  
+> example.py 실행하여 작동 확인   
+> 컨테이너가 죽을 시 (재부팅 등으로 인해) 다시 실행 필요   
+> 죽어있는지 확인 방법   
+> ```   
+> $ docker ps -a   
+> ```   
+> 컨테이너 다시 실행   
+> ```   
+> $ docker start gqcnn   
+> ```   
+
+
 ## Gripper  
    
 > dynamixel로 만든 1DOF gripper position 제어     
