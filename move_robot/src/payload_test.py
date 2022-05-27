@@ -500,58 +500,58 @@ def main():
 
     print "============ Press `Enter` to execute a movement using a joint state goal ..."
 
-    # raw_input()
-    # tutorial.go_to_joint_state1()
-    #
-    # raw_input()
-    # tutorial.go_to_joint_state2()
-    #
-    # raw_input()
-    # tutorial.go_to_joint_state3()
-    #
-    # raw_input()
-    # tutorial.go_to_joint_state4()
-    #
-    # raw_input()
-    # tutorial.go_to_joint_state3()
-    #
-    # raw_input()
-    # tutorial.go_to_joint_state2()
-    #
-    # raw_input()
-    # tutorial.go_to_joint_state5()
-    #
-    #
-    # raw_input()
-    # tutorial.go_to_joint_state6()
-    #
-    # raw_input()
-    # tutorial.go_to_joint_state5()
-    #
-    #
-    # raw_input()
-    # tutorial.go_to_joint_state2()
-    #
-    #
-    # raw_input()
-    # tutorial.go_to_joint_state1()
-
-
     raw_input()
-    tutorial.go_to_pose_goal1()
-
+    tutorial.go_to_joint_state1()
+    
     raw_input()
-    tutorial.go_to_pose_goal2()
-
+    tutorial.go_to_joint_state2()
+    
     raw_input()
-    tutorial.go_to_pose_goal3()
-
+    tutorial.go_to_joint_state3()
+    
     raw_input()
-    tutorial.go_to_pose_goal4()
-
-
+    tutorial.go_to_joint_state4()
+    
     raw_input()
-    tutorial.go_to_home_state()
+    tutorial.go_to_joint_state3()
+    
+    raw_input()
+    tutorial.go_to_joint_state2()
+    
+    raw_input()
+    tutorial.go_to_joint_state5()
+    
+    
+    raw_input()
+    tutorial.go_to_joint_state6()
+    
+    raw_input()
+    tutorial.go_to_joint_state5()
+    
+    
+    raw_input()
+    tutorial.go_to_joint_state2()
+    
+    
+    raw_input()
+    tutorial.go_to_joint_state1()
+
+
+   # raw_input()
+   # tutorial.go_to_pose_goal1()
+
+   # raw_input()
+   # tutorial.go_to_pose_goal2()
+
+   # raw_input()
+   # tutorial.go_to_pose_goal3()
+
+   # raw_input()
+   # tutorial.go_to_pose_goal4()
+
+
+   # raw_input()
+   # tutorial.go_to_home_state()
 
 
     print "============ Python tutorial demo complete!"

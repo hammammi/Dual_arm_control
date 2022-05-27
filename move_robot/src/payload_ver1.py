@@ -7,16 +7,16 @@ import rospy
 from mservo_msg.msg import traj_1d
 
 def commander():
-    pub = rospy.Publisher('arm2',traj_1d,queue_size=10)
+    pub = rospy.Publisher('arm1',traj_1d,queue_size=10)
     rospy.init_node('commander', anonymous=True)
 
     joint_value = {
         'home' : [0,0,0,0,0,0,0],
-        'state1' : [0,90,0,0,0,0,0],
-        'state2' : [0,90,0,-90,0,0,0],
-        'state3' : [0,90,-90,-90,0,0,0],
-        'state4' : [0,90,0,0,0,90,0],
-        'state5' : [0,90,0,0,90,90,0],
+        'state1' : [0,-90,0,0,0,0,0],
+        'state2' : [0,-90,0,90,0,0,0],
+        'state3' : [0,-90,-90,90,0,0,0],
+        'state4' : [0,-90,0,0,0,90,0],
+        'state5' : [0,-90,0,0,90,90,0],
         # 'state6' : [0,-90,0,0,90,90,0],
         # 'pose1' : [-60,-65,15,95,5,70,0],
         # 'pose2' : [10,-50,50,70,50,30,0],
