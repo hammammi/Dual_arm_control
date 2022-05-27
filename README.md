@@ -11,7 +11,8 @@
    
 > **ethercat_test**
 > - ecat_profile_pos_1.cpp,ecat_profile_pos_2.cpp,mani_ecat_homing.cpp : junction 없이 사용
-> - dualarm_ecat_ctrl.cpp 사용 시 wheel과 함께 사용 가능
+> - dualarm_ecat_ctrl.cpp 사용 시 wheel과 함께 사용 가능   
+> - dualarm_ecat_ctrl_j.cpp 220528 일자 마지막 실험 시 사용한 
      
 > **참고**    
 > * ethtool parameter persist 변경 방법       
