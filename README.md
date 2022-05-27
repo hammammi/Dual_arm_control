@@ -99,7 +99,12 @@
 > ```
  
    
-> **move_robot** : c++/c/python 이용해서 매니퓰레이터 제어하는 코드 모음   
+> **move_robot** : c++/c/python 이용해서 매니퓰레이터 제어하는 코드 모음  
+> - dualarm_test.py : 플래그 없이   
+> - dualarm_test_coop.py : 5차년도 최종 시연시 플래그 사용하여 진행한 내용   
+> - payload_test.py, repeatability_test.py : 과제 정량적 성능평가를 위한 테스트용
+> - gqcnn.py, gqcnn_crop_resize.py : 물체검출 시스템을 사용하기 위한 코드파일   
+      
 
 > **참고**   
 >   https://github.com/eYSIP-2017/eYSIP-2017_Robotic_Arm/wiki/Interfacing-MoveIt%21-with-Gazebo    
@@ -109,6 +114,7 @@
 ## Gripper  
    
 > dynamixel로 만든 1DOF gripper position 제어     
+> service 활용함   
 > dynamixel ID, port number 항상 확인    
 >     
 > * dxl_gripper_ctrl.py : 두 개의 그리퍼를 하나의 USB port 활용    
