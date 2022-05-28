@@ -1325,14 +1325,14 @@ void motion_callback_p(const mservo_msg::traj_1d& msg)
             desinc1[i] *= -1;
         }
 //        rt_printf("%i, targetinc1 = %d,\n" ,i, desinc1[i]);
-        maxinc1 = std::max<int>(abs(maxinc1),abs(desinc1[i]-foredes1[i])); //**
+        maxinc1 = std::max<double>(abs(maxinc1),abs(desinc1[i]-foredes1[i])*360.0/resol[i]); //**
 //        rt_printf("%i, maxinc1 = %i,\n" ,i, maxinc1);
     }
 //    rt_printf(" realmaxinc1 = %i,\n" , maxinc1);
 
     for (int i=0; i<7; i++)
     {
-        desvel1[i] = double(abs(desinc1[i]-foredes1[i])/maxinc1); //**
+        desvel1[i] = double(abs(desinc1[i]-foredes1[i])*360.0/resol[i]/maxinc1); //**
 //        rt_printf("%i, desvel = %f,\n" ,i, desvel1[i]);
 
 
@@ -1401,9 +1401,9 @@ void motion_callback(const control_msgs::FollowJointTrajectoryActionGoal::ConstP
 	        }
             foredes1[i] = epos4_drive_pt[i].ptInParam->PositionActualValue; //**
             desinc1[i] = int(pos_desired[j-1][i]) + homepos1[i];
-            maxinc1 = std::max<int>(abs(maxinc1),abs(desinc1[i]-foredes1[i])); //**
+            maxinc1 = std::max<double>(abs(maxinc1),abs(desinc1[i]-foredes1[i])*2*M_PI/resol[i]); //**
 //            rt_printf("%i, maxinc1 = %d,\n" ,i, maxinc1);
-            rt_printf("%i, maxinc1/2 = %d,\n" ,i, abs(desinc1[i]-foredes1[i]));
+            rt_printf("%i, maxinc1/2 = %d,\n" ,i, abs(desinc1[i]-foredes1[i])*2*M_PI/resol[i]);
 
 
 
@@ -1413,7 +1413,7 @@ void motion_callback(const control_msgs::FollowJointTrajectoryActionGoal::ConstP
 
         for (int i=0; i<7; i++)
         {
-            desvel1[i] = double(abs(desinc1[i]-foredes1[i])/maxinc1); //**
+            desvel1[i] = double(abs(desinc1[i]-foredes1[i])*2*M_PI/resol[i]/maxinc1); //**
             rt_printf("%i, desvel = %f,\n" ,i, desvel1[i]);
 
 
