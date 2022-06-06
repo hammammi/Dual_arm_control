@@ -6,7 +6,7 @@
 // This is for Dual-arm mobile platform
 // homepos for ver2 changed on 21. 01. 29
 
-// Updated 22. 05. 29 --> only motioncallback(ver1) modified
+// Updated 22. 06. 06
 
 #include <ros/ros.h>
 #include <stdio.h>
@@ -76,6 +76,7 @@ double gt1 = 0, gt2=0;
 double ap[14] = {0},bp[14] = {0},cp[14] ={0},dp[14] = {0};
 int32_t zeropos[14] = {0}; // initial pos
 int32_t targetpos[14] = {0};
+int32_t targetpos_[14] = {0};
 int32_t homepos[14] = {0,0,0,0,0,0,0,-63715, 38594, 37694, -20069, 85386, -12212, -72300};
 // for ver1 : 0, for ver2 : each home position {-63715, 38594, 37694, -20069, 85386, -12212, -72300};
 double zerovel[14] = {0};  // initial axis vel
@@ -466,7 +467,6 @@ void EPOS_OP(void *arg)
     RTIME dc_remain_time; // remain time to next cycle of REF clock, cur_dc32 % cycletime
     RTIME rt_ts; // updated master time to REF clock
     toff = 0;
-    RTIME pr_t, n_t;
 
     ec_send_processdata();
     cur_time = rt_timer_read();
@@ -559,7 +559,6 @@ void EPOS_OP(void *arg)
 
         if (sys_ready)
         {   
-            pr_t = rt_timer_read();
 
             for (i=0; i<7; i++)
             {
@@ -578,10 +577,11 @@ void EPOS_OP(void *arg)
 			tr[i] = ap[i]*gt1*gt1*gt1 + bp[i]*gt1*gt1 + cp[i]*gt1 + dp[i];
 //			        tr[i] = tr[i] * resol[i]/2/M_PI;
 			if (control1 ==1) targetpos[i] = int (tr[i])+homepos[i];
-			if (i == 3){
+            else if (control1 ==2) targetpos[i] = int(targetpos_[i])+homepos[i];
+//			if (i == 3){
 //	                rt_printf("%i %f %f %f %f\n",i, ap[i],bp[i],cp[i],dp[i]);
-			        rt_printf("target = %d\n",targetpos[i]);}
-//                        epos4_drive_pt[i].ptOutParam->TargetPosition = targetpos[i];
+//			        rt_printf("target = %d\n",targetpos[i]);}
+                    epos4_drive_pt[i].ptOutParam->TargetPosition = targetpos[i];
 
 //		    if (i==3) rt_printf("Desired: %d /Traj: %d / Actual: %d / %i\n",targetpos[i],p_des,epos4_drive_pt[i].ptInParam->PositionActualValue,w);
                 }
@@ -603,11 +603,13 @@ void EPOS_OP(void *arg)
                     tr[i] = ap[i]*gt2*gt2*gt2 + bp[i]*gt2*gt2 + cp[i]*gt2 + dp[i];
 //			        tr[i] = tr[i] * resol[i]/2/M_PI;
 		    if (control2 == 1) targetpos[i] = int (tr[i])+homepos[i];
-			        if (i == 10){
+            else if (control2 == 2) targetpos[i] = int(targetpos_[i])+homepos[i];
+
+//			        if (i == 10){
 //	                rt_printf("%i %f %f %f %f\n",i, ap[i],bp[i],cp[i],dp[i]);
-			        rt_printf("target = %d\n",targetpos[i]);}
+//			        rt_printf("target = %d\n",targetpos[i]);}
 //                  
-//                   epos4_drive_pt[i].ptOutParam->TargetPosition = targetpos[i];
+                   epos4_drive_pt[i].ptOutParam->TargetPosition = targetpos[i];
 
                 }
             }
@@ -619,13 +621,12 @@ void EPOS_OP(void *arg)
                 if(epos4_drive_pt[i].ptInParam->ErrorCode != 0)
                     rt_printf("Error : 0x%x %d\n",epos4_drive_pt[i].ptInParam->ErrorCode, rt_timer_read());
             }
-	        n_t = rt_timer_read();
 
     	    if (control1 == 1){
-                gt1 += double (n_t-pr_t)/NSEC_PER_SEC*500;
+                gt1 += 1;
             }
             if (control2 == 1){
-                gt2 += double (n_t-pr_t)/NSEC_PER_SEC*500;
+                gt2 += 1;
             }
 
         } // sysready
@@ -758,12 +759,12 @@ void pub_run(void *arg)
 //                                  epos4_drive_pt[i].ptOutParam->TargetPosition);
 //                        rt_printf("Following error = %i\n" , epos4_drive_pt[i].ptInParam->PositionActualValue-epos4_drive_pt[i].ptOutParam->TargetPosition);
                         if (i < 7) {
-//                            p_msg.position[i] = epos4_drive_pt[i].ptInParam->PositionActualValue;
-			                p_msg.position[i] = targetpos[i];
+                            p_msg.position[i] = epos4_drive_pt[i].ptInParam->PositionActualValue;
+//			                p_msg.position[i] = targetpos[i];
                         } else {
 //			    rt_printf("%d",epos4_drive_pt[i].ptInParam->PositionActualValue);
-                            // p_msg2.position[i - 7] = epos4_drive_pt[i].ptInParam->PositionActualValue;
-                            p_msg2.position[i-7] = targetpos[i];
+                            p_msg2.position[i - 7] = epos4_drive_pt[i].ptInParam->PositionActualValue;
+                           // p_msg2.position[i-7] = targetpos[i];
                                                 
                         }
                         //rt_printf("\n");
@@ -806,6 +807,7 @@ void motion_callback1(const control_msgs::FollowJointTrajectoryActionGoal::Const
 
     for (int j=1;j<traj;++j){
 //        rt_printf("%i, \n" ,j);
+
 	    sec = msg->goal.trajectory.points[j].time_from_start.sec; //***
 	    sec = sec*NSEC_PER_SEC;
     	nsec = msg->goal.trajectory.points[j].time_from_start.nsec; //***
@@ -822,8 +824,8 @@ void motion_callback1(const control_msgs::FollowJointTrajectoryActionGoal::Const
 	        pos_desired_rad_[i] = msg->goal.trajectory.points[j-1].positions[i];	    
 	        pos_desired_rad[i] = msg->goal.trajectory.points[j].positions[i];
 
-	        vel_desired_rad_[i] = msg->goal.trajectory.points[j-1].velocities[i];
-	        vel_desired_rad[i] = msg->goal.trajectory.points[j].velocities[i];            
+	        vel_desired_rad_[i] = msg->goal.trajectory.points[j-1].velocities[i]/500;
+	        vel_desired_rad[i] = msg->goal.trajectory.points[j].velocities[i]/500;
             rt_printf("%i, pos = %f,\n" ,i, pos_desired_rad[i]);
 
 	        if(i==1||i==2||i==4||i==6){
@@ -864,14 +866,14 @@ void motion_callback1(const control_msgs::FollowJointTrajectoryActionGoal::Const
 	    nsec_ = nsec;
     }
 
-    while (ave > 500){
-        for (int i=0; i<7; i++){
-            ave += abs(tr[i]-pos_desired[i]);
-        }
-        ave = ave/7;
-    }
-        
-    control1 = 0;
+//    while (ave > 500){
+//        for (int i=0; i<7; i++){
+//            ave += abs(tr[i]-pos_desired[i]);
+//        }
+//        ave = ave/7;
+//    }
+    control1 = 2;
+    memcpy(&targetpos_[0],pos_desired,sizeof(pos_desired));
 }
 
 void motion_callback2(const control_msgs::FollowJointTrajectoryActionGoal::ConstPtr& msg)
@@ -904,8 +906,8 @@ void motion_callback2(const control_msgs::FollowJointTrajectoryActionGoal::Const
 	        pos_desired_rad_[i] = msg->goal.trajectory.points[j-1].positions[i];	    
 	        pos_desired_rad[i] = msg->goal.trajectory.points[j].positions[i];
 
-	        vel_desired_rad_[i] = msg->goal.trajectory.points[j-1].velocities[i];
-	        vel_desired_rad[i] = msg->goal.trajectory.points[j].velocities[i];            
+	        vel_desired_rad_[i] = msg->goal.trajectory.points[j-1].velocities[i]/500;
+	        vel_desired_rad[i] = msg->goal.trajectory.points[j].velocities[i]/500;            
             rt_printf("%i, pos = %f,\n" ,i, pos_desired_rad[i]);
 
 	        if(i!=5){
@@ -948,14 +950,15 @@ void motion_callback2(const control_msgs::FollowJointTrajectoryActionGoal::Const
 	    sec_ = sec;
 	    nsec_ = nsec;
     }
-    while (ave > 500){
-        for (int i=0; i<7; i++){
-            ave += abs(tr[i+7]-pos_desired[i]);
-        }
-        ave = ave/7;
-    }
+//    while (ave > 500){
+//        for (int i=0; i<7; i++){
+//            ave += abs(tr[i+7]-pos_desired[i]);
+//        }
+//        ave = ave/7;
+//    }
 
-    control2 = 0;
+    control2 = 2;
+    memcpy(&targetpos_[7],pos_desired,sizeof(pos_desired));
 }
 
 
