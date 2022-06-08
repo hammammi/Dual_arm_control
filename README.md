@@ -5,6 +5,7 @@
 
 ## EtherCAT   
 > xenomai, soem 필요   
+> xenomai의 경우 version 3으로 설치했었다. SOEM은 catkin_ws 내에도 다운로드 필요   
 > 관리자 권한 터미널  (sudo -s) 에서 실행   
 > 사용 시 ecat_ifname 항상 확인..   
 > dualarm 사용 시 junction 사용, 배터리 항상 확인 필요
@@ -12,7 +13,8 @@
 > **ethercat_test**
 > - ecat_profile_pos_1.cpp,ecat_profile_pos_2.cpp,mani_ecat_homing.cpp : junction 없이 사용
 > - dualarm_ecat_ctrl.cpp 사용 시 wheel과 함께 사용 가능   
-> - dualarm_ecat_ctrl_j.cpp 220528 일자 마지막 실험 시 사용한 최종본
+> - dualarm_ecat_ctrl_j.cpp 220528 일자 마지막 실험 시 사용한 최종본   
+> - dualarm_ecat_ctrl_j_traj.cpp 220608 일자 control_msgs/FollowJointTrajectoryActionGoal type topic을 받을 시 waypoint 사이의 trajectory를 그려 position 제어하는 node   
      
 > **참고**    
 > * ethtool parameter persist 변경 방법       
@@ -52,6 +54,7 @@
 >
 > * 아래 moveit 패키지 만들 시 urdf가 수정됨
 > * urdf 생성 시 dualarm으로 바로 생성되지 않아 ver1/ver2 각각 urdf 생성 후 파일 수정하여 base link에 연결   
+>    --> ver1,ver2,gripper 모두 2022/06/08 version으로 업데이트 됨   
 > * dummy link, joint를 생성하여야 moveit에서 vurtual joint 활용하여 world에 attatch 가능   
 > * griper 끝을 eef position으로 planning 하기 위해서는 urdf 생성 시 eef joint coordinate를 원하는 위치에 생성해야 함   
 >
@@ -101,9 +104,12 @@
    
 > **move_robot** : c++/c/python 이용해서 매니퓰레이터 제어하는 코드 모음  
 > - dualarm_test.py : 플래그 없이   
-> - dualarm_test_coop.py : 5차년도 최종 시연시 플래그 사용하여 진행한 내용   
-> - payload_test.py, repeatability_test.py : 과제 정량적 성능평가를 위한 테스트용
+> - dualarm_test_coop.py : 5차년도 최종 시연시 플래그 사용하여 진행한 내용, gqcnn 함께 쓸 시 아래 참조   
+> - payload_test.py, repeatability_test.py : 과제 정량적 성능평가를 위한 테스트용   
 > - gqcnn.py, gqcnn_crop_resize.py : 물체검출 시스템을 사용하기 위한 코드파일   
+>    gqcnn 사용 시 pixel과 실제 크기 (mm) 단위 맞추기, 로봇 베이스로부터의 상대 위치 맞추기 위해 calibration 필요   
+>    realsense-viewer 실행하여 카메라 원점 찾고 50mm당 몇 pixel인지 기록   
+>    resizing하는 비율 반영하여 계산 --> dualarm_test,dualarm_test_coop 파일 내에 
       
 
 > **참고**   
@@ -115,6 +121,11 @@
    
 > realsense D435i와 함께 활용
 > 가장 먼저 도커 설치   
+> 그리고 user에게 권한 부여 후 "재부팅"   
+> ```   
+> $ sudo usermod -a -G docker $USER   
+> ```   
+> (해놓지 않으면 컨테이너 실행 시 docker.sock connect시 permission denied 에러 메세지가 뜰 수 있다)   
 > 압축파일 내 docker.sh 실행시켜 컨테이너 생성  
 > example.py 실행하여 작동 확인   
 > 컨테이너가 죽을 시 (재부팅 등으로 인해) 다시 실행 필요   
@@ -126,14 +137,19 @@
 > ```   
 > $ docker start gqcnn   
 > ```   
+> realsense 연결 후 노드 켜기   
+> ```   
+> $ roslaunch realsense2_camera rs_camera.launch   
+> ```   
+> 그리고 move_robot 패키지의 dualarm_test.py 또는 dualarm_test_coop.py 실행   
 
 
 ## Gripper  
    
 > dynamixel로 만든 1DOF gripper position 제어     
-> service 활용함   
+> service 활용함 -> gripper_dist_1,2 0.05   
 > dynamixel ID, port number 항상 확인    
 >     
 > * dxl_gripper_ctrl.py : 두 개의 그리퍼를 하나의 USB port 활용    
 > * dxl_gripper_ctrl1.py, dxl_gripper_ctrl2.py : 각 그리퍼당 하나의 USB port, 총 2개 활용    
->     
+> * roslaunch dxl_gripper gripper.launch --screen : ctrl1,ctrl2 node 두개 동시에 킴    
