@@ -24,7 +24,7 @@
 >   launch 파일 작성하여 <node> 태그 안에   
 >    launch-prefix="ethercat_grant"   
       
-   참고 : https://github.com/orocos/soem   
+>   참고 : https://github.com/orocos/soem   
 > - ecat_profile_pos_1.cpp,ecat_profile_pos_2.cpp,mani_ecat_homing.cpp : junction 없이 사용
 > - dualarm_ecat_ctrl.cpp 사용 시 wheel과 함께 사용 가능   
 > - dualarm_ecat_ctrl_j.cpp 220528 일자 마지막 실험 시 사용한 최종본   
@@ -113,7 +113,13 @@
 > terminal2   
 > ```
 > $ roslaunch dualarm_moveit dualarm_bringup_rviz.launch   
-> ```
+> ```   
+> gazebo launch 시 'position_controllers/JointTrajectoryController' does not exist. 에러가 날 경우 다음 설치   
+> ```   
+> $ sudo apt-get install ros-melodic-position-controllers   
+> ```   
+   
+
  
    
 > **move_robot** : c++/c/python 이용해서 매니퓰레이터 제어하는 코드 모음  
