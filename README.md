@@ -1,16 +1,30 @@
 # mservo_manipulator_control
-
+   
+> Ubuntu 18.04 LTS 환경에서 개발   
+   
 ## massage   
 > **mservo_msg** : mservo lab에서 사용하는 ros msgs   
 
 ## EtherCAT   
 > xenomai, soem 필요   
-> xenomai의 경우 version 3으로 설치했었다. SOEM은 catkin_ws 내에도 다운로드 필요   
-> 관리자 권한 터미널  (sudo -s) 에서 실행   
+> xenomai의 경우 version 3으로 설치했었다.  
+> SOEM   
+> ```   
+> $ sudo apt install ros-<DISTRO>-soem   
+> ```   
 > 사용 시 ecat_ifname 항상 확인..   
 > dualarm 사용 시 junction 사용, 배터리 항상 확인 필요
    
-> **ethercat_test**
+> **ethercat_test**   
+> 관리자 권한 터미널  (sudo -s) 에서 실행   
+>   --> 다음과 같이 설치하면 그냥 실행가능하다고 하는데 안해봄   
+>   ```
+>   $ sudo apt install ros-<DISTRO>-ethercat-ethercat_grant   
+>   ```   
+>   launch 파일 작성하여 <node> 태그 안에   
+>    launch-prefix="ethercat_grant"   
+      
+   참고 : https://github.com/orocos/soem   
 > - ecat_profile_pos_1.cpp,ecat_profile_pos_2.cpp,mani_ecat_homing.cpp : junction 없이 사용
 > - dualarm_ecat_ctrl.cpp 사용 시 wheel과 함께 사용 가능   
 > - dualarm_ecat_ctrl_j.cpp 220528 일자 마지막 실험 시 사용한 최종본   
