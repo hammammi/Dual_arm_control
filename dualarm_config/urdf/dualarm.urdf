@@ -21,15 +21,11 @@
   </gazebo>
 
 
-
-
-
-
   <link
     name="base_link">
     <inertial>
       <origin
-        xyz="1.56125112837913E-17 8.67361737988404E-17 0.05"
+        xyz="0.32 0.225 0.1"
         rpy="0 0 0" />
       <mass
         value="100" />
@@ -43,11 +39,11 @@
     </inertial>
     <visual>
       <origin
-        xyz="0 0 0"
+        xyz="-0.32 -0.225 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://dualarm_config/meshes/base_link.STL" />
+          filename="package://dualarm_config/meshes/base.STL" />
       </geometry>
       <material
         name="">
@@ -61,13 +57,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://dualarm_config/meshes/base_link.STL" />
+          filename="package://dualarm_config/meshes/base.STL" />
       </geometry>
     </collision>
   </link>
 
-  <gazebo reference="base_link">
-              
+  <gazebo reference="base_link">              
     		<material>Gazebo/White</material>
   </gazebo>
 
@@ -82,7 +77,7 @@
     name="base_joint_left"
     type="fixed">
     <origin
-      xyz="0.23 0 0.112"
+      xyz="0.230 0 0.376"
       rpy="0 0 0" />
     <parent
       link="base_link" />
@@ -600,17 +595,17 @@
     name="mani1_eff">
     <inertial>
       <origin
-        xyz="-0.000133432671937198 -0.00026720248316253 0.0371126103217597"
+        xyz="0.00052359 -0.00015741 0.046995"
         rpy="0 0 0" />
       <mass
-        value="0.264591621524854" />
+        value="0.26908" />
       <inertia
-        ixx="0.000328897075428674"
-        ixy="6.36751840475174E-07"
-        ixz="-4.37613653992511E-06"
-        iyy="0.000471727781170237"
-        iyz="-1.51230461925619E-06"
-        izz="0.000237270015047809" />
+        ixx="8.5289E-05"
+        ixy="9.3888E-10"
+        ixz="-1.0334E-07"
+        iyy="0.00013205"
+        iyz="-3.8971E-07"
+        izz="0.00014078" />
     </inertial>
     <visual>
       <origin
@@ -618,12 +613,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://dualarm_config/meshes/mani1_eff.STL" />
+          filename="package://dualarm_config/meshes/mani1_eef.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+          rgba="0.79216 0.81961 0.93333 1" />
       </material>
     </visual>
     <collision>
@@ -632,13 +627,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://dualarm_config/meshes/mani1_eff.STL" />
+          filename="package://dualarm_config/meshes/mani1_eef.STL" />
       </geometry>
     </collision>
   </link>
 
   <gazebo reference="mani1_eff">
-              
     		<material>Gazebo/White</material>
   </gazebo>
 
@@ -646,7 +640,7 @@
     name="mani1_joint7"
     type="revolute">
     <origin
-      xyz="0 -0.3209 0"
+      xyz="0 -0.175 0.0"
       rpy="1.5708 0 0" />
     <parent
       link="mani1_link7" />
@@ -680,7 +674,7 @@
     name="base_joint_right"
     type="fixed">
     <origin
-      xyz="-0.23 0 0.112"
+      xyz="-0.230 0 0.364"
       rpy="0 0 0" />
     <parent
       link="base_link" />
@@ -690,23 +684,22 @@
       xyz="0 0 0" />
   </joint>
 
-
-
+<!-- Mani2 base -->
   <link
     name="mani2_base">
     <inertial>
       <origin
-        xyz="1.97959527329819E-10 0.000122650399488422 0.0341469504763563"
+        xyz="-3.1029E-18 3.9676E-18 0.006"
         rpy="0 0 0" />
       <mass
-        value="1.0280663793568" />
+        value="0.43725" />
       <inertia
-        ixx="0.00414721532795568"
-        ixy="-5.49548192013201E-11"
-        ixz="-9.12311082359067E-12"
-        iyy="0.00414946878796714"
-        iyz="-4.93277463545251E-06"
-        izz="0.00435856653972013" />
+        ixx="0.0015698"
+        ixy="1.096E-20"
+        ixz="1.1641E-20"
+        iyy="0.0015694"
+        iyz="-1.1277E-20"
+        izz="0.0031287" />
     </inertial>
     <visual>
       <origin
@@ -719,7 +712,7 @@
       <material
         name="">
         <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+          rgba="0.79216 0.81961 0.93333 1" />
       </material>
     </visual>
     <collision>
@@ -732,27 +725,74 @@
       </geometry>
     </collision>
   </link>
-
-  <gazebo reference="mani2_base">
-              
-    		<material>Gazebo/White</material>
-  </gazebo>
-
+  <link
+    name="mani2_link1">
+    <inertial>
+      <origin
+        xyz="0.00025963 -4.4216E-06 0.06121"
+        rpy="0 0 0" />
+      <mass
+        value="0.67076" />
+      <inertia
+        ixx="0.00095513"
+        ixy="-1.4502E-08"
+        ixz="-1.0271E-06"
+        iyy="0.00094832"
+        iyz="-1.8227E-09"
+        izz="0.0012889" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dualarm_config/meshes/mani2_link1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://dualarm_config/meshes/mani2_link1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="mani2_fixed"
+    type="fixed">
+    <origin
+      xyz="0 0 0.012"
+      rpy="0 0 1.5708" />
+    <parent
+      link="mani2_base" />
+    <child
+      link="mani2_link1" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
   <link
     name="mani2_link2">
     <inertial>
       <origin
-        xyz="-4.0866E-05 0.021123 0.075652"
+        xyz="6.849E-05 -0.015121 0.063905"
         rpy="0 0 0" />
       <mass
-        value="0.53869" />
+        value="0.63538" />
       <inertia
-        ixx="0.0012067"
-        ixy="6.8923E-07"
-        ixz="-1.5046E-06"
-        iyy="0.001046"
-        iyz="-3.1922E-05"
-        izz="0.0010791" />
+        ixx="0.00072901"
+        ixy="-3.9612E-07"
+        ixz="1.1922E-06"
+        iyy="0.0010627"
+        iyz="2.6423E-06"
+        izz="0.00069297" />
     </inertial>
     <visual>
       <origin
@@ -778,24 +818,14 @@
       </geometry>
     </collision>
   </link>
- 
-  <gazebo reference="mani2_link2">
-              
-    		<material>Gazebo/White</material>
-  </gazebo>
-
-
-
-
-
- <joint
+  <joint
     name="mani2_joint1"
     type="revolute">
     <origin
-      xyz="0 0 0.1125"
-      rpy="6.123E-17 0 0" />
+      xyz="0 0 0.125"
+      rpy="0 0 1.5708" />
     <parent
-      link="mani2_base" />
+      link="mani2_link1" />
     <child
       link="mani2_link2" />
     <axis
@@ -806,28 +836,21 @@
       effort="100"
       velocity="0.8" />
   </joint>
-
-
-
-
-
-
-
   <link
     name="mani2_link3">
     <inertial>
       <origin
-        xyz="1.5796E-06 -0.1511 0.015227"
+        xyz="-0.00018188 -0.11832 0.041393"
         rpy="0 0 0" />
       <mass
-        value="0.5456" />
+        value="0.55009" />
       <inertia
-        ixx="0.0029482"
-        ixy="-3.4034E-07"
-        ixz="3.1372E-07"
-        iyy="0.0011955"
-        iyz="-0.00074241"
-        izz="0.0025539" />
+        ixx="0.0009283"
+        ixy="-9.2458E-07"
+        ixz="-9.3918E-07"
+        iyy="0.00082363"
+        iyz="1.9373E-05"
+        izz="0.00096206" />
     </inertial>
     <visual>
       <origin
@@ -853,18 +876,12 @@
       </geometry>
     </collision>
   </link>
-
-  <gazebo reference="mani2_link3">
-              
-    		<material>Gazebo/White</material>
-  </gazebo>
-
   <joint
     name="mani2_joint2"
     type="revolute">
     <origin
-      xyz="0 0 0.08"
-      rpy="-1.5708 -1.2246E-16 1.4997E-32" />
+      xyz="0 -0.069 0.0675"
+      rpy="-1.5708 0 0" />
     <parent
       link="mani2_link2" />
     <child
@@ -877,22 +894,21 @@
       effort="100"
       velocity="0.8" />
   </joint>
-
   <link
     name="mani2_link4">
     <inertial>
       <origin
-        xyz="4.4431E-05 0.015991 0.082592"
+        xyz="-8.8281E-05 -0.009886 0.069843"
         rpy="0 0 0" />
       <mass
-        value="0.38216" />
+        value="0.45928" />
       <inertia
-        ixx="0.00080362"
-        ixy="-2.4425E-07"
-        ixz="1.0241E-06"
-        iyy="0.00056579"
-        iyz="-3.0014E-05"
-        izz="0.00067534" />
+        ixx="0.00040071"
+        ixy="-2.3353E-07"
+        ixz="-1.992E-06"
+        iyy="0.00052253"
+        iyz="2.47E-05"
+        izz="0.00038096" />
     </inertial>
     <visual>
       <origin
@@ -918,18 +934,12 @@
       </geometry>
     </collision>
   </link>
-
-  <gazebo reference="mani2_link4">
-              
-    		<material>Gazebo/White</material>
-  </gazebo>
-
   <joint
     name="mani2_joint3"
     type="revolute">
     <origin
-      xyz="0 -0.211 0"
-      rpy="1.5708 0 1.2246E-16" />
+      xyz="0 -0.2197 0.069"
+      rpy="1.5708 0 0" />
     <parent
       link="mani2_link3" />
     <child
@@ -942,22 +952,21 @@
       effort="100"
       velocity="0.8" />
   </joint>
-
   <link
     name="mani2_link5">
     <inertial>
       <origin
-        xyz="-0.00010955 -0.13127 0.015556"
+        xyz="0.00019482 -0.11792 0.037427"
         rpy="0 0 0" />
       <mass
-        value="0.34477" />
+        value="0.43981" />
       <inertia
-        ixx="0.0014747"
-        ixy="-1.3036E-06"
-        ixz="1.5048E-07"
-        iyy="0.00050678"
-        iyz="-0.00036636"
-        izz="0.0012721" />
+        ixx="0.00052212"
+        ixy="1.2216E-07"
+        ixz="-9.6251E-08"
+        iyy="0.00035826"
+        iyz="1.9152E-05"
+        izz="0.00054597" />
     </inertial>
     <visual>
       <origin
@@ -983,18 +992,12 @@
       </geometry>
     </collision>
   </link>
-
-  <gazebo reference="mani2_link5">
-              
-    		<material>Gazebo/White</material>
-  </gazebo>
-
   <joint
     name="mani2_joint4"
     type="revolute">
     <origin
-      xyz="0 0 0.089"
-      rpy="-1.5708 1.2246E-16 -1.4997E-32" />
+      xyz="0 -0.061 0.0753"
+      rpy="-1.5708 0 0" />
     <parent
       link="mani2_link4" />
     <child
@@ -1007,22 +1010,21 @@
       effort="100"
       velocity="0.8" />
   </joint>
-
   <link
     name="mani2_link6">
     <inertial>
       <origin
-        xyz="3.9049E-05 0.024475 0.16254"
+        xyz="1.0745E-05 0.030079 0.16626"
         rpy="0 0 0" />
       <mass
-        value="0.25794" />
+        value="0.30699" />
       <inertia
-        ixx="0.0024806"
-        ixy="-4.5125E-07"
-        ixz="-2.0865E-06"
-        iyy="0.0023381"
-        iyz="-0.00053561"
-        izz="0.00037044" />
+        ixx="0.0004714"
+        ixy="3.3142E-08"
+        ixz="-6.2237E-09"
+        iyy="0.00049632"
+        iyz="-4.3014E-05"
+        izz="0.00023077" />
     </inertial>
     <visual>
       <origin
@@ -1048,18 +1050,12 @@
       </geometry>
     </collision>
   </link>
-
-  <gazebo reference="mani2_link6">
-              
-    		<material>Gazebo/White</material>
-  </gazebo>
-
   <joint
     name="mani2_joint5"
     type="revolute">
     <origin
-      xyz="0 -0.192 0"
-      rpy="1.5708 0 -1.2246E-16" />
+      xyz="0 -0.2 0.061"
+      rpy="-1.5708 0 3.1416" />
     <parent
       link="mani2_link5" />
     <child
@@ -1072,22 +1068,21 @@
       effort="100"
       velocity="0.8" />
   </joint>
-
   <link
     name="mani2_link7">
     <inertial>
       <origin
-        xyz="-1.2744E-07 -0.0039301 0.00163"
+        xyz="-0.00010944 -0.0075746 -0.032739"
         rpy="0 0 0" />
       <mass
-        value="0.085765" />
+        value="0.10158" />
       <inertia
-        ixx="4.9521E-05"
-        ixy="3.1372E-11"
-        ixz="2.1472E-08"
-        iyy="5.5321E-05"
-        iyz="-8.9092E-07"
-        izz="4.8098E-05" />
+        ixx="6.5446E-05"
+        ixy="-2.9093E-08"
+        ixz="4.8842E-08"
+        iyy="6.9978E-05"
+        iyz="2.982E-07"
+        izz="6.75E-05" />
     </inertial>
     <visual>
       <origin
@@ -1113,46 +1108,39 @@
       </geometry>
     </collision>
   </link>
-
-  <gazebo reference="mani2_link7">
-              
-    		<material>Gazebo/White</material>
-  </gazebo>
-
   <joint
     name="mani2_joint6"
     type="revolute">
     <origin
-      xyz="0 0 0.258"
-      rpy="-1.5708 1.2246E-16 1.4997E-32" />
+      xyz="0 0.032 0.25"
+      rpy="-1.5708 0 0" />
     <parent
       link="mani2_link6" />
     <child
       link="mani2_link7" />
     <axis
-      xyz="0 0 1" />
+      xyz="0 0 -1" />
     <limit
       lower="-2.09"
       upper="2.09"
       effort="100"
       velocity="0.8" />
   </joint>
-
   <link
     name="mani2_link8">
     <inertial>
       <origin
-        xyz="0.000106683288908073 -6.92912993472234E-05 0.0450290416907149"
+        xyz="0.00052359 -0.00015741 0.046995"
         rpy="0 0 0" />
       <mass
-        value="0.280769723735081" />
+        value="0.26908" />
       <inertia
-        ixx="0.000365119430776465"
-        ixy="6.26730661839489E-07"
-        ixz="-1.96011098720024E-06"
-        iyy="0.000507982667175265"
-        iyz="9.01466101450948E-07"
-        izz="0.000251045106293643" />
+        ixx="8.5289E-05"
+        ixy="9.3888E-10"
+        ixz="-1.0334E-07"
+        iyy="0.00013205"
+        iyz="-3.8971E-07"
+        izz="0.00014078" />
     </inertial>
     <visual>
       <origin
@@ -1160,12 +1148,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://dualarm_config/meshes/mani2_link8.STL" />
+          filename="package://dualarm_config/meshes/mani2_eef.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+          rgba="0.79216 0.81961 0.93333 1" />
       </material>
     </visual>
     <collision>
@@ -1174,22 +1162,16 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://dualarm_config/meshes/mani2_link8.STL" />
+          filename="package://dualarm_config/meshes/mani2_eef.STL" />
       </geometry>
     </collision>
   </link>
-
-  <gazebo reference="mani2_link8">
-              
-    		<material>Gazebo/White</material>
-  </gazebo>
-
   <joint
     name="mani2_joint7"
     type="revolute">
     <origin
-      xyz="0 -0.1745 0"
-      rpy="1.5708 0 -1.2246E-16" />
+      xyz="0 -0.0405 -0.032"
+      rpy="1.5708 0 0" />
     <parent
       link="mani2_link7" />
     <child
@@ -1202,10 +1184,6 @@
       effort="100"
       velocity="0.8" />
   </joint>
-
-
-
-
 
 
 
