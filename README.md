@@ -116,8 +116,9 @@
 > ```   
 > gazebo launch 시 'position_controllers/JointTrajectoryController' does not exist. 에러가 날 경우 다음 설치   
 > ```   
-> $ sudo apt-get install ros-melodic-position-controllers   
+> $ sudo apt-get install ros-melodic-joint-trajectory-controller   
 > ```   
+> position controller에서 joint trajectory controller가 없어서 그런 것이다.   
    
 
  
