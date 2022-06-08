@@ -6,20 +6,23 @@ import rospy, rospkg
 
 import moveit_commander
 import moveit_msgs.msg
+import shape_msgs.msg
 import tf
-# import scipy
+import scipy
+
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 import geometry_msgs.msg
 from dxl_gripper.srv import GripperDist, GripperDistResponse
 from moveit_commander.conversions import pose_to_list
-#from cip_data.gqcnn import calc_grasping_point
 #from scipy.spatial.transform import Rotation as R
+from gqcnn import calc_grasping_point
+from gqcnn_crop_resize import crop_and_resize
 
 from math import pi
 import numpy as np
 from matplotlib import pyplot as plt
-#import cv2
+import cv2
 import time
 
 ## END_SUB_TUTORIAL
@@ -53,9 +56,9 @@ class MoveGroupPythonIntefaceTutorial(object):
   def __init__(self, robot_name):
     super(MoveGroupPythonIntefaceTutorial, self).__init__()
     self.rgb_image_sub = rospy.Subscriber(
-          "/camera/color/image_raw", Image, self._rgb_CB, queue_size=1)
+          "/camera2/color/image_raw", Image, self._rgb_CB, queue_size=1)
     self.rs_image_sub = rospy.Subscriber(
-            "/camera/depth/image_rect_raw", Image, self._depth_CB, queue_size=1)
+            "/camera2/depth/image_rect_raw", Image, self._depth_CB, queue_size=1)
     self.rgb_trigger = True
     self.depth_trigger = True
     self.rospack = rospkg.RosPack()
@@ -140,7 +143,7 @@ class MoveGroupPythonIntefaceTutorial(object):
   def go_to_state(self, joint_goals):
 
     move_group = self.move_group
-
+    move_group.set_max_velocity_scaling_factor(0.3)
     # left middle side
     joint_goal = move_group.get_current_joint_values()
     for i in range(len(joint_goal)):
@@ -262,12 +265,12 @@ class MoveGroupPythonIntefaceTutorial(object):
     #return all_close(pose_goal, current_pose, 0.01)
     return True
 
-  def plan_cartesian_path(self, scale=1):
+  def plan_cartesian_path1(self, scale=1):
 
     move_group = self.move_group
 
     # Set Max velocity of this motion
-    move_group.set_max_velocity_scaling_factor(0.1)
+    move_group.set_max_velocity_scaling_factor(0.7)
 
 
     ## BEGIN_SUB_TUTORIAL plan_cartesian_path
@@ -278,19 +281,14 @@ class MoveGroupPythonIntefaceTutorial(object):
     ## for the end-effector to go through. If executing  interactively in a
     ## Python shell, set scale = 1.0.
     ##
-    waypoints = []
-
+    waypoints = []        	
     wpose = move_group.get_current_pose().pose
-    # wpose.position.z += scale * 0.1  # First move up (z)
-    # wpose.position.y += scale * 0.2 # and sideways (y)
-    # waypoints.append(copy.deepcopy(wpose))
 
-    wpose.position.y += scale * 0.07  # Second move forward/backwards in (x)
-    # wpose.position.y += scale * 0.1
+    wpose.position.z -= scale * 0.05 
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z -= scale * 0.05
     waypoints.append(copy.deepcopy(wpose))
 
-    # wpose.position.y -= scale * 0.2 # Third move sideways (y)
-    # waypoints.append(copy.deepcopy(wpose))
 
     # We want the Cartesian path to be interpolated at a resolution of 1 cm
     # which is why we will specify 0.01 as the eef_step in Cartesian
@@ -299,19 +297,189 @@ class MoveGroupPythonIntefaceTutorial(object):
     # for this tutorial.
     (plan, fraction) = move_group.compute_cartesian_path(
                                        waypoints,   # waypoints to follow
-                                       0.005,        # eef_step
+                                       0.001,        # eef_step
                                        0.0)         # jump_threshold
 
     # Note: We are just planning, not asking move_group to actually move the robot yet:
 
 
-
     move_group.execute(plan, wait=True)
+    return plan, fraction
 
+  def plan_cartesian_path2(self, scale=1):
+
+    move_group = self.move_group
+    move_group.set_max_velocity_scaling_factor(0.4)
+    waypoints = []
+
+    wpose = move_group.get_current_pose().pose
+
+    wpose.position.x -= scale * 0.05
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x -= scale * 0.05
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.y += scale * 0.003
+    waypoints.append(copy.deepcopy(wpose))
+
+    wpose.position.z += scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x -= scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+
+
+
+    wpose.position.x -= scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+
+    wpose.position.y += scale * 0.003
+    waypoints.append(copy.deepcopy(wpose))
+    
+    wpose.position.z += scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x -= scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+
+    wpose.position.x -= scale * 0.003
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x -= scale * 0.003
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x -= scale * 0.003
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x -= scale * 0.003
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x -= scale * 0.003
+    waypoints.append(copy.deepcopy(wpose))
+
+
+    wpose.position.y -= scale * 0.006
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.y -= scale * 0.006
+    waypoints.append(copy.deepcopy(wpose))
+
+
+
+    (plan, fraction) = move_group.compute_cartesian_path(
+                                       waypoints,   
+                                       0.0005,        
+                                       0.0)         
+    move_group.execute(plan, wait=True)
+    return plan, fraction
+
+  def plan_cartesian_path3(self, scale=1):
+
+    move_group = self.move_group
+    move_group.set_max_velocity_scaling_factor(0.4)
+    waypoints = []
+
+    wpose = move_group.get_current_pose().pose
+
+    wpose.position.z += scale * 0.004
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.004
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.004
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+
+    wpose.position.x += scale * 0.004
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.004
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.004
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.004
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.004
+    waypoints.append(copy.deepcopy(wpose))
+
+    wpose.position.x += scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.01
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.01
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.x += scale * 0.01
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.01
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.01
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.01
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.01
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.01
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.01
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.01
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.01
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.01
+    waypoints.append(copy.deepcopy(wpose))
+
+    (plan, fraction) = move_group.compute_cartesian_path(
+                                       waypoints,   
+                                       0.0005,        
+                                       0.0)         
+    move_group.execute(plan, wait=True)
+    return plan, fraction
+
+  def plan_cartesian_path4(self, scale=1):
+
+    move_group = self.move_group
+    move_group.set_max_velocity_scaling_factor(0.4)
+    waypoints = []
+
+    wpose = move_group.get_current_pose().pose
+
+    wpose.position.y -= scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.y -= scale * 0.005
+    waypoints.append(copy.deepcopy(wpose))
+
+    (plan, fraction) = move_group.compute_cartesian_path(
+                                       waypoints,   
+                                       0.0005,        
+                                       0.0)         
+    move_group.execute(plan, wait=True)
+    return plan, fraction
+
+  def plan_cartesian_path10(self, scale=1):
+
+    move_group = self.move_group
+    move_group.set_max_velocity_scaling_factor(0.4)
+    waypoints = []
+
+    wpose = move_group.get_current_pose().pose
+
+    wpose.position.z += scale * 0.025
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.025
+    waypoints.append(copy.deepcopy(wpose))
+    wpose.position.z += scale * 0.025
+    waypoints.append(copy.deepcopy(wpose))
+
+    (plan, fraction) = move_group.compute_cartesian_path(
+                                       waypoints,   
+                                       0.0005,        
+                                       0.0)         
+    move_group.execute(plan, wait=True)
     return plan, fraction
 
 
-    ## END_SUB_TUTORIAL
 
   def plan_cartesian_path_out(self, scale=1):
 
@@ -393,6 +561,7 @@ class MoveGroupPythonIntefaceTutorial(object):
       rospy.wait_for_service('gripper_dist_2')
       try:
         result = rospy.ServiceProxy('gripper_dist_2', GripperDist)
+
         ret = result(dist)
         return ret
       except rospy.ServiceException as e:
@@ -460,109 +629,71 @@ def main():
     manipulator2 = MoveGroupPythonIntefaceTutorial('manipulator2') #left
 
     print( "============ Press `Enter` to execute a movement using a joint state goal ...")
-    manipulator = False
+    manipulator = True
     if manipulator:
-      raw_input()
+      
 
       joint_goals = np.array([
-        [3,1,1,0,0,0,0,0],
-        [3,2,1,0,0,0,0,0],
-
-        [1,-42,0,0,0,0,60,20],
-        [1,-41,17,-11,52,1,101,39],
-        [1,-49,24,-9,61,6,95,31],
-        [3,1,0,0,0,0,0,0],
-        [1,-41,17,-11,52,1,101,39],
-        [1,-120,7,19,65,2,101,75],
-
-        [2, 74, 0,0,54,0,84,0],
-        [2,74,44,-11,54,7,84,-24],
-        [2,75,55,-11,55,9,70,-25],
-        [3,2,0,0,0,0,0,0],
-        [2,73,46,-11,45,8,89,-23],
-        [2,73,4,-15,99,1,78,-32],
-        [2,69,17,-17,101,6,62,-42],
-        [3,2,1,0,0,0,0,0],
-        [2,67,2,-18,10,11,40,-39],
-        
-        [1,-41,17,-11,52,1,101,39],
-        [2,0,0,0,0,0,0,0],
-
-        [1,-49,24,-9,61,6,95,31],
-        [3,1,1,0,0,0,0,0],
-        [1,-41,17,-11,52,1,101,39],
-        [1,-41,17,-11,0,0,50,0],
-        [1,0,0,0,0,0,0,0],
+	[1,-37,-25,-31,76,0,77,-52],        
+	[2,-120,15,30,-94,-42,-82,120],     # Moving tool to Box
+	[1,0,0,0,0,0,0,0],
+	[2,0,0,0,0,0,0,0]
+      
       ])
 
+      raw_input()
       manipulator1.go_to_home_state()
-      raw_input()
-      print("done")
-      manipulator2.go_to_home_state()
-      raw_input()
-      print("done")
-      for i in range(len(joint_goals)):
-        raw_input()
-        if i == 3: print("grasped!")
-        print(joint_goals[i])
-        if joint_goals[i][0] == 1:
+      print("done")      
 
-          manipulator1.go_to_state(joint_goals[i][1:]*np.pi/180)
-        elif joint_goals[i][0] == 2:
-          manipulator2.go_to_state(joint_goals[i][1:]*np.pi/180)
-        elif joint_goals[i][0] == 3: # gripper
-          if joint_goals[i][1] == 1: # mani 1
-            if joint_goals[i][2] == 0: # close 1
-              manipulator1.gripper_request(0.007)
-            else:
-              manipulator1.gripper_request(0.06)
-          else: # mani 2
-            if joint_goals[i][2] == 0: # close 2
-              manipulator2.gripper_request(0.02)
-            else: # open 2
-              manipulator2.gripper_request(0.05)
-        else:
-          pass
-        print("done")
+      raw_input()
+      manipulator2.go_to_home_state()
+      print("done")
+
+      box_pose = geometry_msgs.msg.PoseStamped()
+      box_pose.header.frame_id = "mani2_link8"
+      box_pose.pose.orientation.w = 1.0
+      box_pose.pose.position.z = 0
+      box_pose.pose.position.y = 0
+      box_pose.pose.position.x = 0
+      box_name = "box"
+      manipulator2.scene.add_box(box_name, box_pose, size=(0.1, 0.1, 0.1))
+      manipulator2.scene.attach_box("mani2_link8",box_name,touch_links = ["mani2_link8"])
+
+      #
+      raw_input()
+      manipulator2.set_pose_goal([215,446,324,-3,-0.00170,3.02]);
+      print("done")
+
+      raw_input()
+      manipulator1.go_to_home_state()
+      
+      manipulator2.scene.remove_attached_object("mani2_link8",box_name)
+      # manipulator2.scene.remove_world_object("centerbox")
+
+      print("done")
+
+      raw_input()
+      manipulator2.go_to_home_state()
+      print("done")
+
+      manipulator2.scene.remove_world_object(box_name)
+
+#      for i in range(len(joint_goals)):
+#        raw_input()
+#        print(joint_goals[i])
+#        if joint_goals[i][0] == 1:
+
+ #         manipulator1.go_to_state(joint_goals[i][1:]*np.pi/180)
+#        elif joint_goals[i][0] == 2:
+#          manipulator2.go_to_state(joint_goals[i][1:]*np.pi/180)
+#        else:
+#          pass
+#        print("done")
 
     
       # tutorial.go_to_joint_state3()
 
       # raw_input()
-      # tutorial.go_to_joint_state3()
-      #
-      #raw_input()
-      #tutorial.go_to_pose_goal1()
-
-
-      # print "============ Press `Enter` to execute a movement using a pose goal ..."
-      # raw_input()
-
-      # move_group.setMaxVelocityScalingFactor(0.2);
-      #
-      # joint_goa2 = move_group.get_current_joint_values()
-      # def moveit_commander.move_group.MoveGroupCommander.set_max_velocity_scaling_factor
-      # max_velocity_scaling_factor = 0.14
-
-      # print "============ Press `Enter` to plan and display a Cartesian path ..."
-      # raw_input()
-      # cartesian_plan, fraction = tutorial.plan_cartesian_path()
-
-
-      # print "============ Press `Enter` to plan and display a Cartesian path ..."
-      # raw_input()
-      # cartesian_plan, fraction = tutorial.plan_cartesian_path_out()
-      # print "============ Press `Enter` to display a saved trajectory (this will replay the Cartesian path)  ..."
-      # raw_input()
-      # tutorial.display_trajectory(cartesian_plan)
-
-      # print "============ Press `Enter` to execute a saved path ..."
-      # raw_input()
-      # tutorial.execute_plan(cartesian_plan)
-
-      raw_input()
-      manipulator1.go_to_home_state()
-      manipulator2.go_to_home_state()
     else:
       print("hi")
       rgb_path = manipulator1.rospack.get_path('move_robot')+'/src/cip_data/figure_rgb0.png'
@@ -575,12 +706,12 @@ def main():
       # print(manipulator1.move_group.get_current_pose().pose)
 
       # manipulator1.go_to_home_state()
-      manipulator2.go_to_home_state()
-      (trans, rot) = manipulator2.get_tf()
-      print(rot)
-      r = R.from_quat(rot)
+      #manipulator2.go_to_home_state()
+      #(trans, rot) = manipulator2.get_tf()
+      #print(rot)
+      #r = R.from_quat(rot)
       # print(r.as_euler('xyz'))
-      print(r.as_euler('zyx')) # [-yaw,-pitch,-roll]
+      #print(r.as_euler('zyx')) # [-yaw,-pitch,-roll]
 
 
       # print(tf.transformations.euler_from_quaternion(manipulator2.get_tf()[1]))
@@ -591,37 +722,40 @@ def main():
       # manipulator1.set_pose_goal([0.1393,-0.7623,0.5510 ,-1])
 
       if path.isfile(rgb_path) and path.isfile(depth_path):
-        grasping_point = calc_grasping_point(rgb_path, depth_path, result_path)
+	crop_and_resize(rgb_path, depth_path)        
+	grasping_point = calc_grasping_point(rgb_path, depth_path, result_path)
         print(grasping_point)
         center = grasping_point['center']
         angle = grasping_point['angle']
-        real_position = np.array([(center[0]-320)/100*95, -(center[1]-240)/100*95, 10]) #(x,y) (mm)
+        #real_position = np.array([(center[0]-320)/100*95, -(center[1]-240)/100*95, 10]) #(x,y) (mm)
+        #real_position = np.array([(center[0]-320)/26.6*25, -(center[1]-240)/26.6*25, 10]) #(x,y) (mm)
+        real_position = np.array([(center[0]-320)/(75*0.74)*50, -(center[1]-240)/(75*0.67)*50, 10]) #(x,y) (mm)  /(pixel*resizing factor)*mm
+  
         print(real_position)
         # real_position = [0,0,0]
         # angle = 0
       
         # TODO: get mobile robot tf
         # tf_robot = np.array([trans[0],trans[1], 631])
-        tf_robot = np.array([-100,-650, 631])
-        # tf_robot = np.array([-100,-650, 631])
+        #tf_robot = np.array([-100,-650, 631])
         # TODO: get p_table (x,y,z)
         # p_table = np.array([235,523,735])
-        p_table = np.array([0,0,735])
-        p_box = np.array([-250,-180, 170])
-        p_maporigin_obj = p_table + real_position
+        #p_table = np.array([0,0,735])
+        #p_box = np.array([-250,-180, 170])
+        #p_maporigin_obj = p_table + real_position
 
-        p_robot_box = p_table + p_box - tf_robot #[-250, 470, 250]
+        #p_robot_box = p_table + p_box - tf_robot #[-250, 470, 250]
 
         box_pose = geometry_msgs.msg.PoseStamped()
         box_pose.header.frame_id = "dummy_link"
 
         box_pose.pose.orientation.w = 1.0
-        box_pose.pose.position.z = 0.6
-        box_pose.pose.position.y = 0.12+0.65
-        box_pose.pose.position.x = 0+0.1
-        box_name = "box0"
-        manipulator1.scene.add_box(box_name, box_pose, size=(0.1, 0.12, 0.02))
-        # manipulator2.scene.add_box(box_name, box_pose, size=(0.1, 0.12, 0.02))
+        box_pose.pose.position.z = 0.777
+        box_pose.pose.position.y = 0.635
+        box_pose.pose.position.x = 0.04
+        box_name = "Cameracollision"
+        manipulator1.scene.add_box(box_name, box_pose, size=(0.28, 0.30, 0.16))
+        manipulator2.scene.add_box(box_name, box_pose, size=(0.28, 0.30, 0.16))
 
         box_pose = geometry_msgs.msg.PoseStamped()
         box_pose.header.frame_id = "dummy_link"
@@ -629,75 +763,158 @@ def main():
         box_pose.pose.position.z = 0.4
         box_pose.pose.position.y = 0
         box_name = "box"
-        manipulator2.scene.add_box(box_name, box_pose, size=(0.2, 0.2, 1))
+        manipulator2.scene.add_box(box_name, box_pose, size=(0.1, 0.1, 1))
         # manipulator1.scene.add_box(box_name, box_pose, size=(0.2, 0.2, 1))
         # quit()
 
-        p_robot_box_0 = [-310 - tf_robot[0], p_robot_box[1]+25, 150+p_robot_box[2], np.pi, 0, np.pi/2] # lefter outmost
-        manipulator2.set_pose_goal(p_robot_box_0)
-        print("1")
+# NEW FOR EXPERIMENT 
+        
+ 	# parameters
+	ydistance = 600
+	tf_robot = np.array([0,ydistance,177]) #(x=same,distance between origin of manipulator and camera,height / both +)        
+	tool_location = real_position + tf_robot
+        tool_depth = np.array([0,0,180])
+	adjustment = 2 #height adjustment while grasping tool
+	going_up2 = 100 #(tool)
+	going_down2 = -200 #(tool)
+	box_location = np.array([380,0,200]) #from camera origin
+        p_robot_tool3 = [tf_robot[0]+box_location[0], tf_robot[1]+box_location[1], tf_robot[2]+box_location[2], np.pi, 0, np.pi/2] 
+
+        p_robot_tool4 = [tf_robot[0]+box_location[0], tf_robot[1]+box_location[1], tf_robot[2]+box_location[2]+going_down2, np.pi, 0, np.pi/2] 
+  
+
+	manipulator1.go_to_home_state()
+	manipulator2.go_to_home_state()
+	#manipulator1.gripper_request(0.08)
+        #manipulator2.gripper_request(0.08)
+
+   # Before Grasping tool
+        p_robot_tool = [tool_location[0], tool_location[1], tool_depth[2]+going_up2, np.pi, 0, np.pi/2] 
+        manipulator2.set_pose_goal(p_robot_tool)
+
+   # Moving Downwards to grasp tool
+        p_robot_tool_md = [tool_location[0], tool_location[1], tool_depth[2]+adjustment, np.pi, 0, np.pi/2] 
+        manipulator2.set_pose_goal(p_robot_tool_md)
+	
+        time.sleep(2)
+
+	#manipulator2.gripper_request(0.025)
+
+   # Move upwards
+        p_robot_tool2 = [tool_location[0], tool_location[1], tool_depth[2]+going_up2 , np.pi, 0, np.pi/2] 
+        manipulator2.set_pose_goal(p_robot_tool2)
+
+
+      mani_goals = np.array([
+        [1,-37,-25,-31,76,0,77,-52],        
+	[2,-120,15,30,-94,-42,-82,120]
+        #[1,-142,3,21,67,12,90,58],   # Mani1 Box handle removal
+        #[1,-140,6,23,81,10,74,59],   # Mani1 Box handle removal Approaching Box (x,y,z=38,43,32.2)
+        #[3,1,0,0,0,0,0,0],   #Grasp
+        #[4,0,0,0,0,0,0,0],   # Mani1 Box handle upwards
+        #[1,-148,21,14,59,13,85,42],   # Mani1 Box cover placing1 
+        #[1,-151,34,18,72,10,61,35],    # Mani1 Box cover placing2 (59,43,16.5)
+        #[1,-148,21,14,59,13,85,42],
+        #[3,1,1,0,0,0,0,0],   # Box Cover Release
+        #[5,0,0,0,0,0,0,0],
+        #[2,54,72,103,-27,-111,101,29],     # Moving tool to Box
+        #[2,51,81,107,-25,-110,92,28],     # Placing tool inside Box
+        #[3,2,1,0,0,0,0,0],     # Tool Release
+        #[6,0,0,0,0,0,0,0]
+	])
+      for i in range(len(mani_goals)):
+        if mani_goals[i][0] == 1:
+	  manipulator1.go_to_state(mani_goals[i][1:]*np.pi/180) 
+ 	elif mani_goals[i][0] == 2:
+            manipulator2.go_to_state(mani_goals[i][1:]*np.pi/180) 
+        elif mani_goals[i][0] == 3: # gripper
+          if mani_goals[i][1] == 1: # mani 1
+            if mani_goals[i][2] == 0: # close 1
+              manipulator1.gripper_request(0.03)
+            else:
+              manipulator1.gripper_request(0.08)
+          else: # mani 2
+            if mani1_goals[i][2] == 0: # close 2
+              manipulator2.gripper_request(0.025)
+            else: # open 2
+              manipulator2.gripper_request(0.08) 
+
+        elif mani_goals[i][0]==4:
+	  manipulator1.plan_cartesian_path10()
+        elif mani_goals[i][0]==5:
+ 	  manipulator1.go_to_home_state() 
+        elif mani_goals[i][0]==6:
+ 	  manipulator2.go_to_home_state() 
+        else:
+          pass
+          
+
+
+
+
+
+
+
+
+        #p_robot_box_0 = [-310 - tf_robot[0], p_robot_box[1]+25, 150+p_robot_box[2], np.pi, 0, np.pi/2] # lefter outmost
+        #manipulator2.set_pose_goal(p_robot_box_0)
+        #print("1")
         # time.sleep(1)
         
-        p_robot_box_1 = [p_robot_box[0], p_robot_box[1], 150+p_robot_box[2], np.pi, 0, np.pi/2] # to box_air
-        manipulator2.set_pose_goal(p_robot_box_1)
+        #p_robot_box_1 = [p_robot_box[0], p_robot_box[1], 150+p_robot_box[2], np.pi, 0, np.pi/2] # to box_air
+        #manipulator2.set_pose_goal(p_robot_box_1)
         # time.sleep(0.5)
-        print("2")
+        #print("2")
 
-        p_robot_box_2 = [p_robot_box[0], p_robot_box[1], p_robot_box[2], np.pi, 0, np.pi/2] # to box handle
-        manipulator2.set_pose_goal(p_robot_box_2)
+        #p_robot_box_2 = [p_robot_box[0], p_robot_box[1], p_robot_box[2], np.pi, 0, np.pi/2] # to box handle
+        #manipulator2.set_pose_goal(p_robot_box_2)
         # time.sleep(0.5)
         # quit()
-        print("3")
+        #print("3")
 
-        manipulator2.scene.remove_world_object(box_name)
+        #manipulator2.scene.remove_world_object(box_name)
         
-        manipulator2.gripper_request(0.007)
+    #    manipulator2.gripper_request(0.007)
 
-        p_robot_box_1 = [p_robot_box[0], p_robot_box[1], 150+p_robot_box[2], np.pi, 0, np.pi/2]  # to box air (after grasp)
-        manipulator2.set_pose_goal(p_robot_box_1)
+        #p_robot_box_1 = [p_robot_box[0], p_robot_box[1], 150+p_robot_box[2], np.pi, 0, np.pi/2]  # to box air (after grasp)
+        #manipulator2.set_pose_goal(p_robot_box_1)
         # time.sleep(1)
-        print("4")
+        #print("4")
 
-        p_robot_box_0 = [-400 - tf_robot[0], p_robot_box[1], 150+p_robot_box[2], np.pi, 0, np.pi/2] # lefter outmost (after grasp)
-        manipulator2.set_pose_goal(p_robot_box_0)
+        #p_robot_box_0 = [-400 - tf_robot[0], p_robot_box[1], 150+p_robot_box[2], np.pi, 0, np.pi/2] # lefter outmost (after grasp)
+        #manipulator2.set_pose_goal(p_robot_box_0)
         # time.sleep(1)
-        print("5")
+        #print("5")
 
 
-        p_robot_obj = p_maporigin_obj - tf_robot
-        print(p_robot_obj)
+        #p_robot_obj = p_maporigin_obj - tf_robot
+        #print(p_robot_obj)
 
-        w = -r.as_euler('zyx')[0]
+       # w = -r.as_euler('zyx')[0]
         # w=0
 
-        p_robot_obj_0 = [350 - tf_robot[0], p_robot_obj[1], 50+p_robot_obj[2], -np.pi,  0, -w-angle] # to righter outmost
-        manipulator1.set_pose_goal(p_robot_obj_0)
+        #p_robot_obj_0 = [350 - tf_robot[0], p_robot_obj[1], 50+p_robot_obj[2], -np.pi,  0, -w-angle] # to righter outmost
+        #manipulator1.set_pose_goal(p_robot_obj_0)
         # print(manipulator1.move_group.get_current_joint_values())
-        time.sleep(1)
-        print("6")
+      #  time.sleep(1)
+        #print("6")
 
-        p_robot_obj_1 = list(p_robot_obj[:2]) + [50+p_robot_obj[2], -np.pi,  0, -w-angle] # to obj_air
-        manipulator1.set_pose_goal(p_robot_obj_1)
+        #p_robot_obj_1 = list(p_robot_obj[:2]) + [50+p_robot_obj[2], -np.pi,  0, -w-angle] # to obj_air
+        #manipulator1.set_pose_goal(p_robot_obj_1)
         # print(manipulator1.move_group.get_current_joint_values())
-        time.sleep(1)
-        print("7")
+    #    time.sleep(1)
+        #print("7")
 
-        p_robot_obj_2 = list(p_robot_obj) + [-np.pi,  0, -w-angle] # to obj
-        manipulator1.set_pose_goal(p_robot_obj_2)
+        #p_robot_obj_2 = list(p_robot_obj) + [-np.pi,  0, -w-angle] # to obj
+        #manipulator1.set_pose_goal(p_robot_obj_2)
         # print(manipulator1.move_group.get_current_joint_values())
-        time.sleep(1)
-        print("8")
+     #   time.sleep(1)
+        #print("8")
 
-        manipulator1.gripper_request(0.015)
+     #   manipulator1.gripper_request(0.015)
 
         # p_robot_obj_1 = list(p_robot_obj[:2]) + [50+p_robot_obj[2], -np.pi,  0, -w-angle] # to obj_air
         # manipulator1.set_pose_goal(p_robot_obj_1)
-
-        if -w-angle < 0:
-          target_angle = -np.pi/2
-        else:
-          target_angle = np.pi/2
-        
 
         # p_robot_obj_3 = np.copy(p_robot_obj_1)
         # p_robot_obj_3[2] = p_robot_box[2] + 10
@@ -707,9 +924,9 @@ def main():
           states = [-0.9595101846605951, 0.26497518660891206, 0.007779192181427419, 1.2694110516302564, 0.09060212369140697, 1.079005502442003, 1.637026607583806]
         else:
           states = [2.179431778683787, -0.7623196054617134, 0.32418525754211824, -0.4371157074048426, -0.24413223310636756, -1.667470072618892, -1.5902639066093958]
-        manipulator1.go_to_state(states)
+        #manipulator1.go_to_state(states)
         time.sleep(1)
-        print("9")
+        #print("9")
 
         # manipulator2.scene.remove_world_object(box_name)
 
@@ -723,33 +940,33 @@ def main():
         # time.sleep(1)
         # print("11")
 
-        manipulator1.gripper_request(0.06)        
+      #  manipulator1.gripper_request(0.06)        
 
         # p_robot_box_1 = [p_robot_box[0], p_robot_box[1]+15, 150+p_robot_box[2], -np.pi, 0, target_angle]  # to box air (after grasp)
         # manipulator1.set_pose_goal(p_robot_box_1)
         # # time.sleep(1)
         # print("12")
 
-        p_robot_obj_0 = [350 - tf_robot[0], p_robot_obj[1]+15, 150+p_robot_obj[2], -np.pi,  0, target_angle] # to righter outmost
-        manipulator1.set_pose_goal(p_robot_obj_0)
+        #p_robot_obj_0 = [350 - tf_robot[0], p_robot_obj[1]+15, 150+p_robot_obj[2], -np.pi,  0, target_angle] # to righter outmost
+        #manipulator1.set_pose_goal(p_robot_obj_0)
         time.sleep(1)
-        print("13")
+        #print("13")
 
         manipulator1.go_to_home_state()
-        print("14")
+        print("-1")
         
 
-        p_robot_box_1 = [p_robot_box[0], p_robot_box[1], 150+p_robot_box[2], np.pi, 0, np.pi/2]  # to box air (after grasp)
-        manipulator2.set_pose_goal(p_robot_box_1)
+        #p_robot_box_1 = [p_robot_box[0], p_robot_box[1], 150+p_robot_box[2], np.pi, 0, np.pi/2]  # to box air (after grasp)
+        #manipulator2.set_pose_goal(p_robot_box_1)
         # time.sleep(1)
-        print("15")
+        #print("15")
 
-        p_robot_box_2 = [p_robot_box[0], p_robot_box[1], -50 + p_robot_box[2], np.pi, 0, np.pi/2] # to box handle
-        manipulator2.set_pose_goal(p_robot_box_2)
+        #p_robot_box_2 = [p_robot_box[0], p_robot_box[1], -50 + p_robot_box[2], np.pi, 0, np.pi/2] # to box handle
+        #manipulator2.set_pose_goal(p_robot_box_2)
         # time.sleep(1)
-        print("16")
+        #print("16")
 
-        manipulator2.gripper_request(0.07)
+     #   manipulator2.gripper_request(0.07)
 
         manipulator2.go_to_home_state()
 

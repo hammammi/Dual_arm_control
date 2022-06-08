@@ -175,7 +175,7 @@ class MoveGroupPythonIntefaceTutorial(object):
     joint_goal[6] = 0
 
 
-    move_group.set_max_velocity_scaling_factor(0.1)
+    move_group.set_max_velocity_scaling_factor(0.5)
 
     move_group.go(joint_goal, wait=True)
 
@@ -478,12 +478,14 @@ class MoveGroupPythonIntefaceTutorial(object):
     return (trans,rot)
 
 def main_loop(rgb_path, depth_path, result_path, manipulator1, manipulator2):
-#  crop_and_resize(rgb_path, depth_path)        
-#  grasping_point = calc_grasping_point(rgb_path, depth_path, result_path)
-#  print(grasping_point)
-#  center = grasping_point['center']
-#  angle = grasping_point['angle']
-  real_position = np.array([-229.32330827, 11.27819549, 10]) #(x,y) (mm)
+  crop_and_resize(rgb_path, depth_path)        
+  grasping_point = calc_grasping_point(rgb_path, depth_path, result_path)
+  print(grasping_point)
+  center = grasping_point['center']
+  angle = grasping_point['angle']
+  #real_position = np.array([-229.32330827, 11.27819549, 10]) #(x,y) (mm)
+  #real_position = np.array([(center[0]-320)/26.6*25, -(center[1]-240)/26.6*25, 10]) #(x,y) (mm)
+  real_position = np.array([(center[0]-320)/75*50, -(center[1]-240)/75*50, 10]) #(x,y) (mm)
   print(real_position)
 
   box_pose = geometry_msgs.msg.PoseStamped()
@@ -554,9 +556,9 @@ def main_loop(rgb_path, depth_path, result_path, manipulator1, manipulator2):
   p_robot_tool_md = [tool_location[0], tool_location[1], tool_depth[2]+adjustment, np.pi, 0, np.pi/2] 
   manipulator2.set_pose_goal(p_robot_tool_md)
 
-  time.sleep(3)
-  manipulator2.gripper_request(0.01)     
-  time.sleep(3)
+#  time.sleep(3)
+#  manipulator2.gripper_request(0.01)     
+#  time.sleep(3)
 
   # Move upwards
   p_robot_tool2 = [tool_location[0], tool_location[1], tool_depth[2]+going_up2 , np.pi, 0, np.pi/2] 
@@ -572,10 +574,10 @@ def main_loop(rgb_path, depth_path, result_path, manipulator1, manipulator2):
     [1,-139,7,25,72,7,80,66],
     [11,0,0,0,0,0,0,0],  # y direction adjustment  
     [7,0,0,0,0,0,0,0],   # Downwards
-    [15,0,0,0,0,0,0,0],  # x dir
-    [7,0,0,0,0,0,0,0],   # Downwards
+##    [15,0,0,0,0,0,0,0],  # x dir
+##    [7,0,0,0,0,0,0,0],   # Downwards
     ##[15,0,0,0,0,0,0,0],  # x dir
-    [3,1,0,0,0,0,0,0],   # Grasp   
+#    [3,1,0,0,0,0,0,0],   # Grasp   
     ##[1,-138,11,27,53,5,95,65],    # Mani1 Box handle upwards
     [4,0,0,0,0,0,0,0],           # Mani1 Box handle upwards
     [1,-151,22,19,46,11,96,48],   # Mani1 Box cover placing1 
@@ -583,21 +585,21 @@ def main_loop(rgb_path, depth_path, result_path, manipulator1, manipulator2):
     ##[16,0,0,0,0,0,0,0],
     ##[1,-150,31,17,56,11,79,44],   # Mani1 Box cover placing2 (56.9,43,27)
     [20,0,0,0,0,0,0,0],
-    [20,0,0,0,0,0,0,0],
-    [20,0,0,0,0,0,0,0],
+##    [20,0,0,0,0,0,0,0],
+##    [20,0,0,0,0,0,0,0],
     [8,0,0,0,0,0,0,0],  #Downwards2
-    [3,1,1,0,0,0,0,0],   # Box Cover Release
+#    [3,1,1,0,0,0,0,0],   # Box Cover Release
     [1,-151,22,19,46,11,96,48],
     ##[1,-151,19,19,50,12,95,45],
     [1,-117,-32,-22,80,34,69,40],
     [1,-117,-32,-22,80,34,35,20],
     [5,0,0,0,0,0,0,0],
     [2,46,73,106,-15,-111,104,32],     # Moving tool to Box
-    [12,0,0,0,0,0,0,0],  # ydir
-    [14,0,0,0,0,0,0,0],  # xdir
+#    [12,0,0,0,0,0,0,0],  # ydir
+#    [14,0,0,0,0,0,0,0],  # xdir
     [13,0,0,0,0,0,0,0],  # Downwards
     ##[2,49,79,107,-21,-110,96,29],     # Placing tool inside Box
-    [3,2,1,0,0,0,0,0],     # Tool Release
+#    [3,2,1,0,0,0,0,0],     # Tool Release
     [2,46,73,106,-15,-111,104,32],
     [6,0,0,0,0,0,0,0]
   ])
@@ -717,11 +719,11 @@ def main():
       r = R.from_quat(rot)
       print(r.as_euler('zyx')) # [-yaw,-pitch,-roll]
 
-      while(True):
+
 #        if path.isfile(rgb_path) and path.isfile(depth_path) and manipulator2.flag==ACTIVE:
-        if path.isfile(rgb_path) and path.isfile(depth_path):
+      if path.isfile(rgb_path) and path.isfile(depth_path):
           main_loop(rgb_path, depth_path, result_path, manipulator1, manipulator2)
-        else:
+      else:
           rospy.sleep(0.1)
           
 
