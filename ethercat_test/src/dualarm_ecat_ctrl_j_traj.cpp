@@ -910,7 +910,7 @@ void motion_callback2(const control_msgs::FollowJointTrajectoryActionGoal::Const
 	        vel_desired_rad[i] = msg->goal.trajectory.points[j].velocities[i]/500;            
             rt_printf("%i, pos = %f,\n" ,i, pos_desired_rad[i]);
 
-	        if(i!=5){
+	        if(i==0 || i==2 || i == 4 || i ==5 || i==6){
 			    pos_desired_rad_[i] *= -1;
 			    pos_desired_rad[i] *= -1;
 			    vel_desired_rad_[i] *= -1;
